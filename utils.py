@@ -3,7 +3,7 @@ import os
 import numpy as np
 import random
 
-def process_image(path):
+def process_image(path,threshold_value=127):
     if not os.path.exists("processed"):
         os.makedirs("processed")
 
@@ -20,7 +20,8 @@ def process_image(path):
     gray_path = os.path.join("processed", "gray.jpg")
     cv2.imwrite(gray_path, gray)
     outputs.append(gray_path)
-
+    # Thresholding based on the provided threshold value
+    _, gray = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY)
     # Binary
     _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
     binary_path = os.path.join("processed", "binary.jpg")
