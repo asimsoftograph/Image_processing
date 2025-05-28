@@ -1,146 +1,97 @@
-# import tkinter as tk
-# from tkinter import filedialog
-# from PIL import Image, ImageTk
-# import cv2
-# import os
-# from utils import process_image
-
-# class ImageProcessingApp:
-#     def __init__(self, root):
-#         self.root = root
-#         self.root.title("Image Processing Playground")
-
-#         self.panel = tk.Label(root)
-#         self.panel.pack()
-
-#         btn = tk.Button(root, text="Upload Image", command=self.upload_image)
-#         btn.pack()
-
-#         self.processed_images = []
-#         self.index = 0
-
-#         self.next_btn = tk.Button(root, text="Next", command=self.show_next_image)
-#         self.next_btn.pack()
-#         self.next_btn.config(state=tk.DISABLED)
-
-#     def upload_image(self):
-#         file_path = filedialog.askopenfilename()
-#         if file_path:
-#             self.processed_images = process_image(file_path)
-#             self.index = 0
-#             self.show_image(self.processed_images[self.index])
-#             self.next_btn.config(state=tk.NORMAL)
-
-#     def show_image(self, image_path):
-#         img = Image.open(image_path)
-#         img = img.resize((400, 400))
-#         img = ImageTk.PhotoImage(img)
-#         self.panel.config(image=img)
-#         self.panel.image = img
-
-#     def show_next_image(self):
-#         self.index += 1
-#         if self.index < len(self.processed_images):
-#             self.show_image(self.processed_images[self.index])
-#         else:
-#             self.index = 0
-#             self.show_image(self.processed_images[self.index])
-
-# if __name__ == "__main__":
-#     root = tk.Tk()
-#     app = ImageProcessingApp(root)
-#     root.mainloop()
-
-
-
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from utils import process_image
-import os
 
 class ImageProcessingApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Image Processing Playground")
+        self.low_thresh = 100
+        self.high_thresh = 200
         self.threshold_val = 127
+        self.current_file_path = None
+        self.current_mode = "gray"
 
         # Upload button
         self.upload_btn = tk.Button(root, text="Upload Image", command=self.upload_image)
         self.upload_btn.pack(pady=5)
 
-        # Threshold slider
-        self.slider = tk.Scale(root, from_=0, to=255, orient="horizontal",
-                               label="Threshold Value", command=self.slider_changed)
-        self.slider.set(self.threshold_val)
-        self.slider.pack(pady=5)
+        # Processing buttons in a horizontal frame
+        self.button_frame = tk.Frame(root)
+        self.button_frame.pack(pady=5)
 
-        # Scrollable frame for showing all images
-        self.canvas = tk.Canvas(root, width=600, height=400)
-        self.scrollbar = tk.Scrollbar(root, orient="vertical", command=self.canvas.yview)
-        self.scrollable_frame = tk.Frame(self.canvas)
+        self.gray_btn = tk.Button(self.button_frame, text="Grayscale", command=lambda: self.set_mode("gray"))
+        self.gray_btn.pack(side="left", padx=2)
+        self.hsv_btn = tk.Button(self.button_frame, text="HSV", command=lambda: self.set_mode("hsv"))
+        self.hsv_btn.pack(side="left", padx=2)
+        self.edges_btn = tk.Button(self.button_frame, text="Edges", command=lambda: self.set_mode("edges"))
+        self.edges_btn.pack(side="left", padx=2)
+        self.binary_btn = tk.Button(self.button_frame, text="Binary", command=lambda: self.set_mode("binary"))
+        self.binary_btn.pack(side="left", padx=2)
+        self.luminance_btn = tk.Button(self.button_frame, text="Luminance", command=lambda: self.set_mode("luminance"))
+        self.luminance_btn.pack(side="left", padx=2)
+        self.blur_btn = tk.Button(self.button_frame, text="Blur", command=lambda: self.set_mode("blur"))
+        self.blur_btn.pack(side="left", padx=2)
+        self.contours_btn = tk.Button(self.button_frame, text="Contours", command=lambda: self.set_mode("contours"))
+        self.contours_btn.pack(side="left", padx=2)
+        self.original_btn = tk.Button(self.button_frame, text="Original", command=lambda: self.set_mode("original"))
+        self.original_btn.pack(side="left", padx=2)
+        self.binary_threshold_btn = tk.Button(self.button_frame, text="Binary Threshold",
+                                              command=lambda: self.set_mode("binary_threshold"))
+        self.binary_threshold_btn.pack(side="left", padx=2)
+        self.watermark_btn = tk.Button(self.button_frame, text="Watermark", command=lambda: self.set_mode("watermark"))
+        self.watermark_btn.pack(side="left", padx=2)
+        self.noise_btn = tk.Button(self.button_frame, text="Noise", command=lambda: self.set_mode("noise"))
+        self.noise_btn.pack(side="left", padx=2)
+        self.sharpness_btn = tk.Button(self.button_frame, text="Sharpen", command=lambda: self.set_mode("sharpen"))
+        self.sharpness_btn.pack(side="left", padx=2)
 
-        self.scrollable_frame.bind(
-            "<Configure>",
-            lambda e: self.canvas.configure(
-                scrollregion=self.canvas.bbox("all")
-            )
-        )
+        # Threshold sliders
+        self.low_slider = tk.Scale(root, from_=0, to=255, orient="horizontal",
+                                   label="Low Threshold", command=self.slider_changed)
+        self.low_slider.set(self.low_thresh)
+        self.low_slider.pack()
+        self.high_slider = tk.Scale(root, from_=0, to=255, orient="horizontal",
+                                    label="High Threshold", command=self.slider_changed)
+        self.high_slider.set(self.high_thresh)
+        self.high_slider.pack()
 
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-        self.canvas.configure(yscrollcommand=self.scrollbar.set)
-
-        self.canvas.pack(side="left", fill="both", expand=True)
-        self.scrollbar.pack(side="right", fill="y")
-
-        self.image_paths = []
-        self.img_widgets = []
-        self.current_file_path = None
+        # Image display
+        self.img_label = tk.Label(root)
+        self.img_label.pack(pady=10)
 
     def upload_image(self):
         file_path = filedialog.askopenfilename()
         if file_path:
             self.current_file_path = file_path
-            self.update_images()
+            self.update_image()
 
-    def slider_changed(self, value):
-        self.threshold_val = int(value)
-        if self.current_file_path:
-            self.update_images()
+    def set_mode(self, mode):
+        self.current_mode = mode
+        self.update_image()
 
-    def update_images(self):
-        # Clear previous widgets
-        for widget in self.scrollable_frame.winfo_children():
-            widget.destroy()
+    def slider_changed(self, _=None):
+        self.low_thresh = self.low_slider.get()
+        self.high_thresh = self.high_slider.get()
+        self.update_image()
 
-        self.image_paths = process_image(self.current_file_path, self.threshold_val)
-        self.img_widgets = []
+    def update_image(self):
+        if not self.current_file_path:
+            return
+        out_path = process_image(
+            self.current_file_path,
+            mode=self.current_mode,
+            threshold_value=self.threshold_val,
+            low_thresh=self.low_thresh,
+            high_thresh=self.high_thresh
+        )
+        img = Image.open(out_path)
+        img = img.resize((300, 300))
+        tk_img = ImageTk.PhotoImage(img)
+        self.img_label.configure(image=tk_img)
+        self.img_label.image = tk_img
 
-        #image captions 
-        captions = [
-            "Original", "Grayscale", "Binary", "HSB",
-            "Luminance", "Blur", "Edges", "Contours","rotated","noise","Watermark","embossed","sharpened","cartoon"
-        ]
-
-        # for i, path in enumerate(self.image_paths):
-        #     img = Image.open(path)
-        #     img = img.resize((300, 300))
-        #     tk_img = ImageTk.PhotoImage(img)
-        #     label = tk.Label(self.scrollable_frame, image=tk_img)
-        #     label.image = tk_img  # Keep reference
-        #     label.grid(row=i//2, column=i % 2, padx=10, pady=10)
-        for i, (path, caption) in enumerate(zip(self.image_paths, captions)):
-            img = Image.open(path)
-            img = img.resize((300, 300))
-            tk_img = ImageTk.PhotoImage(img)
-
-            label = tk.Label(self.scrollable_frame, image=tk_img)
-            label.image = tk_img
-            label.grid(row=i, column=0, padx=10, pady=10)
-            caption_label = tk.Label(self.scrollable_frame, text=caption)
-            caption_label.grid(row=i, column=1, padx=10, pady=10)
-            self.img_widgets.append((label, caption_label))
-      
 if __name__ == "__main__":
     root = tk.Tk()
     app = ImageProcessingApp(root)
