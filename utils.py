@@ -76,5 +76,58 @@ def process_image(path):
     watermarked_path = os.path.join("processed", "watermarked.jpg")
     cv2.imwrite(watermarked_path, watermarked)
     outputs.append(watermarked_path)
+    
+    
+    #Embosses the image in a 3D space
+    emboss_kernel = np.array([[ -2, -1, 0],
+                          [ -1, 1, 1],
+                          [  0, 1, 2]])
+    embossed = cv2.filter2D(img, -1, emboss_kernel)
+    embossed_path = os.path.join("processed", "embossed.jpg")
+    cv2.imwrite(embossed_path, embossed)
+    outputs.append(embossed_path)
+
+    #Sharpening the image
+    sharpen_kernel = np.array([[ 0, -1, 0],
+                                [-1, 5, -1],
+                                [ 0, -1, 0]])
+    sharpened = cv2.filter2D(img, -1, sharpen_kernel)
+    sharpened_path = os.path.join("processed", "sharpened.jpg")
+    cv2.imwrite(sharpened_path, sharpened)
+    outputs.append(sharpened_path)
+
+    # Randomly rotate the image
+    angle = random.randint(-30, 30)
+    (h, w) = img.shape[:2]
+    center = (w // 2, h // 2)
+    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    rotated = cv2.warpAffine(img, M, (w, h))
+    rotated_path = os.path.join("processed", "rotated.jpg")
+    cv2.imwrite(rotated_path, rotated)
+    outputs.append(rotated_path)
+
+
+    # cartoon effect
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.medianBlur(gray, 5)
+    edges = cv2.adaptiveThreshold(gray, 255,
+                              cv2.ADAPTIVE_THRESH_MEAN_C,
+                              cv2.THRESH_BINARY, 9, 9)
+    color = cv2.bilateralFilter(img, 9, 300, 300)
+    cartoon = cv2.bitwise_and(color, color, mask=edges)
+    cartoon_path = os.path.join("processed", "cartoon.jpg")
+    cv2.imwrite(cartoon_path, cartoon)
+    outputs.append(cartoon_path)
+
+    # Sepia effect
+    sepia_filter = np.array([[0.272, 0.534, 0.131],
+                             [0.349, 0.686, 0.168],
+                             [0.393, 0.769, 0.189]])
+    sepia = cv2.transform(img, sepia_filter)
+    sepia = np.clip(sepia, 0, 255).astype(np.uint8)
+    sepia_path = os.path.join("processed", "sepia.jpg")
+    cv2.imwrite(sepia_path, sepia)
+    outputs.append(sepia_path)
+
 
     return outputs
