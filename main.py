@@ -34,7 +34,13 @@ class ImageProcessingApp:
             ("Watermark", "watermark"),
             ("Noise", "noise"),
             ("Sharpen", "sharpen"),
-            ("Contrast", "contrast")
+            ("Contrast", "contrast"),
+            ("Adaptive Threshold", "adaptive_threshold"),
+            ("Bilateral Filter", "bilateral"),
+            ("Median Filter", "median"),
+            ("Sobel Filter", "sobel"),
+            ("Morphological Operations", "morphological"),
+            ("Histogram Equalization", "histogram_equalization")
         ]
         for text, mode in filters:
             btn = tk.Button(self.button_frame, text=text, command=lambda m=mode: self.set_mode(m))
