@@ -2,7 +2,7 @@ import cv2
 import os
 import numpy as np
 
-from src import grayscale, hsv, edges, binary, luminance, blur, contours, watermark, noise, sharpen, original
+from src import grayscale, hsv, edges, binary, luminance, blur, contours, watermark, noise, sharpen, original,contrast
 
 def process_image(path, mode="gray", threshold_value=127, low_thresh=100, high_thresh=200):
     if not os.path.exists("processed"):
@@ -23,6 +23,7 @@ def process_image(path, mode="gray", threshold_value=127, low_thresh=100, high_t
         "noise": noise.apply,
         "sharpen": sharpen.apply,
         "original": original.apply,
+        "contrast": contrast.apply
     }
 
     if mode in filter_map:

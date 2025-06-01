@@ -34,6 +34,7 @@ class ImageProcessingApp:
             ("Watermark", "watermark"),
             ("Noise", "noise"),
             ("Sharpen", "sharpen"),
+            ("Contrast", "contrast")
         ]
         for text, mode in filters:
             btn = tk.Button(self.button_frame, text=text, command=lambda m=mode: self.set_mode(m))
