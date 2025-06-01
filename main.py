@@ -21,31 +21,23 @@ class ImageProcessingApp:
         self.button_frame = tk.Frame(root)
         self.button_frame.pack(pady=5)
 
-        self.gray_btn = tk.Button(self.button_frame, text="Grayscale", command=lambda: self.set_mode("gray"))
-        self.gray_btn.pack(side="left", padx=2)
-        self.hsv_btn = tk.Button(self.button_frame, text="HSV", command=lambda: self.set_mode("hsv"))
-        self.hsv_btn.pack(side="left", padx=2)
-        self.edges_btn = tk.Button(self.button_frame, text="Edges", command=lambda: self.set_mode("edges"))
-        self.edges_btn.pack(side="left", padx=2)
-        self.binary_btn = tk.Button(self.button_frame, text="Binary", command=lambda: self.set_mode("binary"))
-        self.binary_btn.pack(side="left", padx=2)
-        self.luminance_btn = tk.Button(self.button_frame, text="Luminance", command=lambda: self.set_mode("luminance"))
-        self.luminance_btn.pack(side="left", padx=2)
-        self.blur_btn = tk.Button(self.button_frame, text="Blur", command=lambda: self.set_mode("blur"))
-        self.blur_btn.pack(side="left", padx=2)
-        self.contours_btn = tk.Button(self.button_frame, text="Contours", command=lambda: self.set_mode("contours"))
-        self.contours_btn.pack(side="left", padx=2)
-        self.original_btn = tk.Button(self.button_frame, text="Original", command=lambda: self.set_mode("original"))
-        self.original_btn.pack(side="left", padx=2)
-        self.binary_threshold_btn = tk.Button(self.button_frame, text="Binary Threshold",
-                                              command=lambda: self.set_mode("binary_threshold"))
-        self.binary_threshold_btn.pack(side="left", padx=2)
-        self.watermark_btn = tk.Button(self.button_frame, text="Watermark", command=lambda: self.set_mode("watermark"))
-        self.watermark_btn.pack(side="left", padx=2)
-        self.noise_btn = tk.Button(self.button_frame, text="Noise", command=lambda: self.set_mode("noise"))
-        self.noise_btn.pack(side="left", padx=2)
-        self.sharpness_btn = tk.Button(self.button_frame, text="Sharpen", command=lambda: self.set_mode("sharpen"))
-        self.sharpness_btn.pack(side="left", padx=2)
+        # Filter buttons
+        filters = [
+            ("Grayscale", "gray"),
+            ("HSV", "hsv"),
+            ("Edges", "edges"),
+            ("Binary", "binary"),
+            ("Luminance", "luminance"),
+            ("Blur", "blur"),
+            ("Contours", "contours"),
+            ("Original", "original"),
+            ("Watermark", "watermark"),
+            ("Noise", "noise"),
+            ("Sharpen", "sharpen"),
+        ]
+        for text, mode in filters:
+            btn = tk.Button(self.button_frame, text=text, command=lambda m=mode: self.set_mode(m))
+            btn.pack(side="left", padx=2)
 
         # Threshold sliders
         self.low_slider = tk.Scale(root, from_=0, to=255, orient="horizontal",
