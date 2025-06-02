@@ -2,7 +2,7 @@ import cv2
 import os
 import numpy as np
 
-from src import grayscale, hsv, edges, binary, luminance, blur, contours, watermark, noise, sharpen, original,contrast,adaptive_threshold,bilateral, median,sobel,morphological,histogram_equalization
+from src import grayscale, hsv, edges, binary, luminance, blur, contours, watermark, noise, sharpen, original,contrast,adaptive_threshold,bilateral, median,sobel,histogram_equalization
 
 def process_image(path, mode="gray", threshold_value=127, low_thresh=100, high_thresh=200):
     if not os.path.exists("processed"):
@@ -28,7 +28,7 @@ def process_image(path, mode="gray", threshold_value=127, low_thresh=100, high_t
         "bilateral": bilateral.apply,
         "median": median.apply,
         "sobel": sobel.apply,
-        "morphological": morphological.apply,
+      
         "histogram_equalization": histogram_equalization.apply
         
     }
@@ -40,4 +40,3 @@ def process_image(path, mode="gray", threshold_value=127, low_thresh=100, high_t
         cv2.imwrite(out_path, img)
 
     return out_path
-

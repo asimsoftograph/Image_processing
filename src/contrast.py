@@ -12,4 +12,4 @@ def apply(img, low_thresh, high_thresh):
 
 
 # This function applies contrast enhancement to the input image and then thresholds it.
-# The low_thresh and high_thresh parameters control the contrast enhancement and thresholding.  
+# The low_thresh and high_thresh parameters control the contrast enhancement and thresholding. 

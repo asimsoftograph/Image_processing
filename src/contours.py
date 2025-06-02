@@ -1,4 +1,3 @@
-
 import cv2
 import numpy as np
 def apply(img, low_thresh, high_thresh):
@@ -12,7 +11,6 @@ def apply(img, low_thresh, high_thresh):
     contours, _ = cv2.findContours(binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cv2.drawContours(contours_img, contours, -1, (0, 255, 0), 2)
     return contours_img
-
 
 
 
